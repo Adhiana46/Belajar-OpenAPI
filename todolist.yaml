@@ -1,0 +1,313 @@
+openapi: '3.0.2'
+info:
+  title: Todo List API
+  description: 'OpenAPI for TodoList RESTful API'
+  version: '1.0'
+  termsOfService: https://my-portfolio-mocha-sigma.vercel.app
+  contact:
+    name: Adhiana Mastur
+    email: adhianamastur48@gmail.com
+    url: https://my-portfolio-mocha-sigma.vercel.app
+  license:
+    name: 'Apache 2.0'
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: https://{environment}.adhianadev.com/api/v1
+    description: 'TODOList RESTful API Server'
+    variables:
+      environment:
+        default: 'dev'
+        description: 'Server Environment'
+        enum:
+          - "dev"
+          - "qa"
+          - "prod"
+
+externalDocs:
+  url: http://www.youtube.com/c/ProgrammerZamanNow
+  description: "Youtube Programmer Zaman Now"
+
+paths:
+  /todolist:
+    get:
+      security:
+        - TodolistAuth:
+          - 'read:todolist'
+      tags:
+        - "Todolist"
+      summary: "Get all Todolist"
+      description: "Only return active todolist"
+      parameters:
+        - name: "include_done"
+          in: "query"
+          required: false
+          description: "Include done todolist "
+          schema:
+            type: "boolean"
+            default: true
+            nullable: true
+        - name: "name"
+          in: "query"
+          required: false
+          description: "Filter todolist by name"
+          schema:
+            type: "string"
+            nullable: true
+            minLength: 3
+          examples:
+            java:
+              description: "Example name Java"
+              value: "Java"
+            php:
+              description: "Example name PHP"
+              value: "PHP"
+      responses:
+        200:
+          description: "Success Get Todolist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayTodolist"
+              examples:
+                success:
+                  description: "Example Success"
+                  value:
+                    - id: 1
+                      name: "Olahraga Pagi"
+                      priority: 1
+                      tags:
+                        - olahraga
+                        - gym
+                        - sehat
+                    - id: 2
+                      name: "Belajar Programming"
+                      priority: 1
+                      tags:
+                        - programming
+                        - go
+                        - coding
+    post:
+      security:
+        - TodolistAuth:
+          - 'create:todolist'
+      tags:
+        - "Todolist"
+      summary: "Create a new Todolist"
+      description: "Create a new active todolist"
+      requestBody:
+        description: "Ini description"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateTodolist"
+            examples:
+              Beli Rumah:
+                value:
+                  name: "Beli Rumah"
+                  priority: 10
+                  tags:
+                    - beli
+                    - belanja
+                    - rumah
+              Olahraga Pagi:
+                value:
+                  name: "Olahraga Pagi"
+                  priority: 20
+                  tags:
+                    - workout
+                    - gym
+                    - olahraga
+      responses:
+        200:
+          description: "Success Create Todolist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todolist"
+              examples:
+                success:
+                  description: "Example Success"
+                  value:
+                    id: 1
+                    name: "Olahraga Pagi"
+                    priority: 1
+                    tags:
+                      - olahraga
+                      - gym
+                      - sehat
+
+
+  /todolist/{todolistId}:
+    get:
+      security:
+        - TodolistAuth:
+          - 'read:todolist'
+      tags:
+        - "Todolist"
+      summary: "Get Todolist by ID"
+      description: "Return todolist if exists, if not return error 404"
+      parameters:
+        - $ref: "#/components/parameters/TodolistId"
+      responses:
+        200:
+          description: "Success Get Todolist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todolist"
+              examples:
+                success:
+                  description: "Example Success"
+                  value:
+                    id: 1
+                    name: "Olahraga Pagi"
+                    priority: 1
+                    tags:
+                      - olahraga
+                      - gym
+                      - sehat
+    delete:
+      security:
+        - TodolistAuth:
+          - 'delete:todolist'
+      tags:
+        - "Todolist"
+      summary: "Delete Todolist by ID"
+      description: "Delete todolist forever, if not exists return error 404"
+      parameters:
+        - $ref: "#/components/parameters/TodolistId"
+      responses:
+        200:
+          description: "Success delete todolist"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        404:
+          description: "Todolist not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+              examples:
+                failed:
+                  description: "Failed delete todolist"
+                  value:
+                    success: false
+    put:
+      security:
+        - TodolistAuth:
+          - 'update:todolist'
+      tags:
+        - "Todolist"
+      summary: "Update Todolist by ID"
+      description: "Update todolist by id, if not exists return error 404"
+      parameters:
+        - $ref: "#/components/parameters/TodolistId"
+      requestBody:
+        description: "Ini description"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUpdateTodolist"
+            examples:
+              Beli Rumah:
+                value:
+                  name: "Beli Rumah"
+                  priority: 10
+                  tags:
+                    - beli
+                    - belanja
+                    - rumah
+              Olahraga Pagi:
+                value:
+                  name: "Olahraga Pagi"
+                  priority: 20
+                  tags:
+                    - workout
+                    - gym
+                    - olahraga
+      responses:
+        200:
+          description: "Success Update Todolist"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todolist"
+              examples:
+                success:
+                  description: "Example Success"
+                  value:
+                    id: 1
+                    name: "Olahraga Pagi"
+                    priority: 1
+                    tags:
+                      - olahraga
+                      - gym
+                      - sehat
+
+components:
+  securitySchemes:
+    TodolistAuth:
+      description: "Authentication for todolist RESTful API"
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    TodolistId:
+      name: "todolistId"
+      in: "path"
+      required: true
+      description: "Todolist ID"
+      schema:
+        type: "integer"
+  schemas:
+    Todolist:
+      type: "object"
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        tags:
+          type: array
+          items:
+            type: string
+    CreateUpdateTodolist:
+      type: "object"
+      required:
+        - name
+        - priority
+      properties:
+        name:
+          type: "string"
+          minLength: 3
+        priority:
+          type: integer
+          format: int32
+          minimum: 1
+        tags:
+          type: array
+          items:
+            type: string
+            example:
+              - workout
+              - learn
+              - code
+            minLength: 3
+    ArrayTodolist:
+      type: "array"
+      items:
+        $ref: "#/components/schemas/Todolist"
